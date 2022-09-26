@@ -1,0 +1,16 @@
+html,
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+}
+
+canvas {
+  background-image: url("assets/images/background.jpg");
+  display: block;
+  margin: 0 auto;
+  border: solid 6px #aaa;
+  border-radius: 10px;
+}

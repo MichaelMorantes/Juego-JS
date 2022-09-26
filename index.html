@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="style.css">
+  <title>Animation</title>
+</head>
+
+<body style="position: relative;">
+  <canvas></canvas>
+  <!-- background container -->
+  <div id="iniciarpantalla" style="
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: url('/assets/images/startScreenBackground.png');
+      z-index: 20;
+      background-size: contain;
+      background-repeat: no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    ">
+    <div style="text-align: center">
+      <h1 style="color: white">Electiva I</h1>
+      <h2 style="color: white">Controles:</h2>
+      <li style="color: white; font-weight: bold;">Tecla a: Mover Izquierda</li>
+      <li style="color: white; font-weight: bold;">Tecla d: Mover Derecha</li>
+      <li style="color: white; font-weight: bold;">Tecla Espacio: disparar</li>
+      <br>
+      <!-- button -->
+      <div id="iniciarboton" style="cursor: pointer; position: relative; display: inline-block">
+        <img src="/assets/images/button.png" alt="Start Button" />
+        <span style="
+            position: absolute;
+            color: white;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            left: 50%;
+          ">Iniciar</span>
+      </div>
+    </div>
+  </div>
+  <!-- restart screen -->
+  <!-- background container -->
+  <div id="reiniciarpantalla" style="
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: url('/assets/images/startScreenBackground.png');
+      z-index: 20;
+      background-size: contain;
+      background-repeat: no-repeat;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    ">
+    <div style="text-align: center">
+      <h1 style="color: white">Fin del juego</h1>
+
+      <!-- button -->
+      <div id="reiniciarboton" style="cursor: pointer; position: relative; display: inline-block">
+        <img src="/assets/images/button.png" alt="Restart Button" />
+        <span style="
+            position: absolute;
+            color: white;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            left: 50%;
+          ">Reiniciar</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"
+    integrity="sha512-6+YN/9o9BWrk6wSfGxQGpt3EUK6XeHi6yeHV+TYD2GR0Sj/cggRpXr1BrAQf0as6XslxomMUxXp2vIl+fv0QRA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="text/javascript" src="script.js"></script>
+</body>
+
+</html>
