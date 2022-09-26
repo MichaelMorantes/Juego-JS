@@ -11,7 +11,7 @@ const reiniciarboton = document.getElementById("reiniciarboton");
 Howler.volume(0.2);
 const audio = {
   backgroundMusic: new Howl({
-    src: CarpetaMusica + "backgroundMusic.mp3",
+    src: CarpetaMusica + "backgroundmusic.mp3",
     loop: true,
   }),
   hurt: new Howl({
