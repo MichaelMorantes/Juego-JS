@@ -11,7 +11,7 @@ const reiniciarboton = document.getElementById("reiniciarboton");
 Howler.volume(0.2);
 const audio = {
   backgroundMusic: new Howl({
-    src: CarpetaMusica + "backgroundmusic.mp3",
+    src: CarpetaMusica + "backgroundMusic.mp3",
     loop: true,
   }),
   hurt: new Howl({
@@ -30,8 +30,6 @@ const audio = {
     src: CarpetaMusica + "start.mp3",
   }),
 };
-
-// canvas.style.marginTop = window.innerHeight / 2 - Alto / 2 + "px";
 
 class SpriteAnimado {
   constructor(nombreimagen) {
@@ -69,10 +67,13 @@ class Jugador {
       y: 0,
     };
 
+    this.angulo = 0;
+    this.anguloMov = 0;
+
     const imagen = new Image();
-    imagen.src = CarpetaImagenes + "blackmage.png";
+    imagen.src = CarpetaImagenes + "bfg.png";
     imagen.onload = () => {
-      const Escalado = 0.15;
+      const Escalado = 0.07;
       this.imagen = imagen;
       this.ancho = imagen.width * Escalado;
       this.alto = imagen.height * Escalado;
@@ -84,42 +85,47 @@ class Jugador {
   }
 
   Dibujar() {
+    Contexto.save();
+    Contexto.translate(this.posicion.x + this.ancho / 2, this.posicion.y + this.alto / 2);
+    Contexto.rotate(this.angulo);
+    Contexto.translate(-this.posicion.x - this.ancho / 2, -this.posicion.y - this.alto / 2);
     Contexto.drawImage(this.imagen, this.posicion.x, this.posicion.y, this.ancho, this.alto);
     // Contexto.fillStyle = "red";
     // Contexto.fillRect(this.posicion.x, this.posicion.y, this.ancho, this.alto);
+    Contexto.restore();
   }
 
-  ActualizarMovimiento() {
+  Actualizar() {
     if (this.imagen) {
-      this.Dibujar();
+      this.angulo += radianes(this.anguloMov);
       this.posicion.x += this.velocidad.x;
+      this.Dibujar();
     }
   }
 }
 
 class Proyectil {
-  constructor({ posicion, velocidad, color = "red" }) {
+  constructor({ posicion, velocidad, angulo, color = "red" }) {
     this.posicion = posicion;
     this.velocidad = velocidad;
-    // this.radio = 3;
+    this.angulo = angulo;
     this.ancho = 10;
     this.alto = 10;
     this.color = color;
   }
 
-  DibujarProyectil() {
+  Dibujar() {
     Contexto.beginPath();
-    // Contexto.arc(this.posicion.x, this.posicion.y, this.radio, 0, Math.PI * 2);
     Contexto.fillRect(this.posicion.x, this.posicion.y, this.ancho, this.alto);
     Contexto.fillStyle = this.color;
     Contexto.fill();
     Contexto.closePath();
   }
 
-  ActualizarProyectil() {
-    this.DibujarProyectil();
-    this.posicion.x += this.velocidad.x;
-    this.posicion.y += this.velocidad.y;
+  Actualizar() {
+    this.posicion.x += this.velocidad * Math.cos(this.angulo);
+    this.posicion.y += this.velocidad * Math.sin(this.angulo);
+    this.Dibujar();
   }
 }
 
@@ -133,8 +139,6 @@ class Enemigo extends SpriteAnimado {
       this.posicion = {
         x: Math.floor(Math.random() * (canvas.width - 200)),
         y: Math.floor(Math.random() * (canvas.height / 1.6)),
-        // x: 200,
-        // y: 200,
       };
       this.frameIndex = 0;
       this.count = 0;
@@ -191,6 +195,12 @@ let teclas = {
   space: {
     presionada: false,
   },
+  x: {
+    presionada: false,
+  },
+  z: {
+    presionada: false,
+  },
 };
 let juego = {
   termino: false,
@@ -209,6 +219,12 @@ function init() {
       presionada: false,
     },
     space: {
+      presionada: false,
+    },
+    x: {
+      presionada: false,
+    },
+    z: {
       presionada: false,
     },
   };
@@ -236,7 +252,6 @@ function fin() {
 function animate() {
   if (!juego.activo) return;
   requestAnimationFrame(animate);
-
   const msAhora = window.performance.now();
   const transcurrido = msAhora - msPrevio;
 
@@ -245,7 +260,7 @@ function animate() {
   msPrevio = msAhora - (transcurrido % IntervaloFPS); // 3.34
 
   Contexto.clearRect(0, 0, canvas.width, canvas.height);
-  jugador.ActualizarMovimiento();
+  jugador.Actualizar();
   if (!juego.termino) {
     enemigo.Dibujar(enemigo.State.getState("enemyidle"));
   } else {
@@ -253,21 +268,22 @@ function animate() {
   }
 
   proyectiles.forEach((proyectil, index) => {
-    if (proyectil.posicion.y + proyectil.ancho + proyectil.alto <= 0) {
+    if (
+      proyectil.posicion.y + proyectil.ancho + proyectil.alto <= 0 ||
+      proyectil.posicion.y >= canvas.height ||
+      proyectil.posicion.x >= canvas.width ||
+      proyectil.posicion.x + proyectil.ancho + proyectil.alto <= 0
+    ) {
       setTimeout(() => {
         proyectiles.splice(index, 1);
         // fin();
       }, 0);
     } else {
-      proyectil.ActualizarProyectil();
+      proyectil.Actualizar();
     }
   });
 
   proyectiles.forEach((proyectil, index) => {
-    // NOTA: Colision circular
-    // proyectil.posicion.y - proyectil.radio <= enemigo.posicion.y + enemigo.alto &&
-    // proyectil.posicion.x + proyectil.radio >= enemigo.posicion.x &&
-    // proyectil.posicion.x - proyectil.radio <= enemigo.posicion.x + enemigo.ancho
     if (
       proyectil.posicion.y - proyectil.alto <= enemigo.posicion.y + enemigo.alto &&
       proyectil.posicion.x + proyectil.ancho >= enemigo.posicion.x &&
@@ -288,6 +304,18 @@ function animate() {
   } else {
     jugador.velocidad.x = 0;
   }
+
+  if (teclas.x.presionada) {
+    jugador.anguloMov = 3;
+  } else if (teclas.z.presionada) {
+    jugador.anguloMov = -3;
+  } else {
+    jugador.anguloMov = 0;
+  }
+}
+
+function radianes(angulo) {
+  return (angulo * Math.PI) / 180;
 }
 
 animate();
@@ -325,16 +353,20 @@ addEventListener("keydown", ({ key }) => {
       proyectiles.push(
         new Proyectil({
           posicion: {
-            x: jugador.posicion.x + jugador.ancho / 2.5,
-            y: jugador.posicion.y,
+            x: jugador.posicion.x + jugador.ancho / 2.2,
+            y: jugador.posicion.y + jugador.alto / 2.2,
           },
-          velocidad: {
-            x: 0,
-            y: -10,
-          },
-          color: "blue",
+          velocidad: 10,
+          angulo: jugador.angulo,
+          color: "green",
         })
       );
+      break;
+    case "x":
+      teclas.x.presionada = true;
+      break;
+    case "z":
+      teclas.z.presionada = true;
       break;
     default:
       break;
@@ -351,6 +383,12 @@ addEventListener("keyup", ({ key }) => {
       break;
     case " ":
       teclas.space.presionada = false;
+      break;
+    case "x":
+      teclas.x.presionada = false;
+      break;
+    case "z":
+      teclas.z.presionada = false;
       break;
     default:
       break;
